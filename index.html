@@ -3,26 +3,50 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Mobile-optimized viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+
+    <!-- iOS web app capabilities -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Flappy Bird" />
+
+    <!-- Android web app capabilities -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#4ec0ca" />
+
     <title>Flappy Bird</title>
     <style>
-      body {
-        margin: 0;
-        padding: 0;
+      #fullscreen-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 1000;
         display: flex;
-        justify-content: center;
         align-items: center;
-        min-height: 100vh;
-        background-color: #222;
+        justify-content: center;
+        transition: background-color 0.3s;
       }
-      canvas {
-        display: block;
-        margin: 0 auto;
+      #fullscreen-btn:hover {
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+      #fullscreen-btn:active {
+        background-color: rgba(0, 0, 0, 0.9);
       }
     </style>
   </head>
   <body>
     <div id="app"></div>
+    <button id="fullscreen-btn" title="Toggle Fullscreen">⛶</button>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

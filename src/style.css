@@ -19,19 +19,52 @@
   box-sizing: border-box;
 }
 
+html {
+  /* Prevent scrolling on mobile */
+  overflow: hidden;
+  /* Prevent pull-to-refresh */
+  overscroll-behavior: none;
+  height: 100%;
+  width: 100%;
+}
+
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  padding: 0;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
+  /* Prevent bounce/overscroll on iOS */
+  overscroll-behavior: none;
+  /* Prevent text selection */
+  -webkit-user-select: none;
+  user-select: none;
+  /* Prevent touch callouts */
+  -webkit-touch-callout: none;
+  /* Improve tap responsiveness on iOS */
+  -webkit-tap-highlight-color: transparent;
+  background-color: #222;
 }
 
 #app {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   width: 100%;
-  height: 100vh;
+  height: 100%;
+  /* Prevent all touch actions except single tap */
+  touch-action: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Ensure canvas is properly sized on mobile */
+canvas {
+  /* Prevent any touch gestures on canvas except taps */
+  touch-action: none;
+  /* Prevent image selection/saving on long press */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  /* Max size constraints for mobile */
+  max-width: 100%;
+  max-height: 100%;
 }

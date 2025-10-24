@@ -15,16 +15,17 @@ export class GameScene extends Phaser.Scene {
   private clouds: Phaser.GameObjects.Image[] = []
   private distantMountains: Phaser.GameObjects.Image[] = []
   private closeMountains: Phaser.GameObjects.Image[] = []
+  private skyGradient!: Phaser.GameObjects.Graphics
 
   // Timing
   private pipeSpawnTimer: number = 0
   private pipeSpawnInterval: number = 1500 // milliseconds
 
-  // Constants
-  private readonly GROUND_HEIGHT = 100
-  private readonly PIPE_GAP = 150
-  private readonly PIPE_MIN_Y = 150
-  private readonly PIPE_MAX_Y = 450
+  // Constants - now dynamic based on screen size
+  private GROUND_HEIGHT: number = 100
+  private PIPE_GAP: number = 150
+  private PIPE_MIN_Y: number = 150
+  private PIPE_MAX_Y: number = 450
 
   constructor() {
     super({ key: 'GameScene' })
@@ -34,7 +35,11 @@ export class GameScene extends Phaser.Scene {
     const width = this.cameras.main.width
     const height = this.cameras.main.height
 
+    // Update dynamic constants based on screen height
+    this.updateConstants(height)
+
     // Create gradient sky background
+    this.skyGradient = this.add.graphics()
     this.createSkyGradient(width, height)
 
     // Create mountains (behind clouds)
@@ -62,7 +67,7 @@ export class GameScene extends Phaser.Scene {
     this.scoreText.setDepth(100) // Always render on top
 
     // Create instruction text
-    this.instructionText = this.add.text(width / 2, height / 2 + 50, 'Press SPACE or CLICK to start', {
+    this.instructionText = this.add.text(width / 2, height / 2 + 50, 'Press SPACE or TAP to start', {
       fontSize: '20px',
       color: '#ffffff',
       align: 'center'
@@ -70,7 +75,7 @@ export class GameScene extends Phaser.Scene {
     this.instructionText.setDepth(100) // Always render on top
 
     // Create game over text (hidden initially)
-    this.gameOverText = this.add.text(width / 2, height / 2, 'GAME OVER\n\nPress SPACE or CLICK\nto restart', {
+    this.gameOverText = this.add.text(width / 2, height / 2, 'GAME OVER\n\nPress SPACE or TAP\nto restart', {
       fontSize: '24px',
       color: '#ffffff',
       align: 'center',
@@ -81,6 +86,51 @@ export class GameScene extends Phaser.Scene {
 
     // Set up input
     this.setupInput()
+
+    // Listen for resize events
+    this.scale.on('resize', this.handleResize, this)
+  }
+
+  private updateConstants(height: number): void {
+    // Scale constants based on screen height for better mobile adaptation
+    const baseHeight = 600
+    const scale = height / baseHeight
+
+    this.GROUND_HEIGHT = Math.max(80, Math.min(100 * scale, 120))
+    this.PIPE_GAP = Math.max(120, Math.min(150 * scale, 200))
+    this.PIPE_MIN_Y = Math.max(100, height * 0.2)
+    this.PIPE_MAX_Y = Math.min(height - this.GROUND_HEIGHT - this.PIPE_GAP - 50, height * 0.7)
+  }
+
+  private handleResize(gameSize: Phaser.Structs.Size): void {
+    const width = gameSize.width
+    const height = gameSize.height
+
+    // Update constants
+    this.updateConstants(height)
+
+    // Resize sky gradient
+    this.skyGradient.clear()
+    this.createSkyGradient(width, height)
+
+    // Reposition ground
+    this.ground.setPosition(0, height - this.GROUND_HEIGHT)
+    this.ground.setSize(width, this.GROUND_HEIGHT)
+
+    // Update physics body for ground
+    const groundBody = this.ground.body as Phaser.Physics.Arcade.StaticBody
+    if (groundBody) {
+      groundBody.updateFromGameObject()
+    }
+
+    // Reposition UI elements
+    this.scoreText.setPosition(width / 2, 50)
+    this.instructionText.setPosition(width / 2, height / 2 + 50)
+    this.gameOverText.setPosition(width / 2, height / 2)
+    this.gameOverText.setWordWrapWidth(width - 40)
+
+    // Update camera bounds
+    this.cameras.main.setBounds(0, 0, width, height)
   }
 
   private setupInput(): void {
@@ -89,9 +139,19 @@ export class GameScene extends Phaser.Scene {
       this.handleInput()
     })
 
-    // Mouse click
-    this.input.on('pointerdown', () => {
-      this.handleInput()
+    // Mouse click and touch - optimized for mobile
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      // Only respond to left mouse button or touch
+      if (pointer.leftButtonDown() || pointer.isDown) {
+        this.handleInput()
+      }
+    })
+
+    // Prevent context menu on long press (mobile)
+    this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.rightButtonReleased()) {
+        return false
+      }
     })
   }
 
@@ -226,15 +286,15 @@ export class GameScene extends Phaser.Scene {
 
   private createSkyGradient(width: number, height: number): void {
     // Create a gradient from lighter blue at top to slightly darker at bottom
-    const graphics = this.add.graphics()
-
     // Top section - lighter blue
-    graphics.fillGradientStyle(0x87ceeb, 0x87ceeb, 0x6eb9d9, 0x6eb9d9, 1)
-    graphics.fillRect(0, 0, width, height / 2)
+    this.skyGradient.fillGradientStyle(0x87ceeb, 0x87ceeb, 0x6eb9d9, 0x6eb9d9, 1)
+    this.skyGradient.fillRect(0, 0, width, height / 2)
 
     // Bottom section - transition to mid blue
-    graphics.fillGradientStyle(0x6eb9d9, 0x6eb9d9, 0x5ba5c7, 0x5ba5c7, 1)
-    graphics.fillRect(0, height / 2, width, height / 2)
+    this.skyGradient.fillGradientStyle(0x6eb9d9, 0x6eb9d9, 0x5ba5c7, 0x5ba5c7, 1)
+    this.skyGradient.fillRect(0, height / 2, width, height / 2)
+
+    this.skyGradient.setDepth(0) // Behind everything
   }
 
   private createMountains(width: number, height: number): void {
