@@ -177,7 +177,6 @@ export class GameScene extends Phaser.Scene {
 
   private spawnPipe(): void {
     const width = this.cameras.main.width
-    const height = this.cameras.main.height
 
     // Random gap position
     const gapY = Phaser.Math.Between(this.PIPE_MIN_Y, this.PIPE_MAX_Y)
@@ -234,7 +233,7 @@ export class GameScene extends Phaser.Scene {
     this.pipes = []
   }
 
-  update(time: number, delta: number): void {
+  update(_time: number, delta: number): void {
     // Update mountains and clouds with parallax (always, even when game not started)
     this.updateMountains(delta)
     this.updateClouds(delta)
@@ -408,7 +407,7 @@ export class GameScene extends Phaser.Scene {
     })
   }
 
-  private createClouds(width: number, height: number): void {
+  private createClouds(width: number, _height: number): void {
     // Create simple pixel art cloud using graphics
     const cloudGraphics = this.add.graphics()
 

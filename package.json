@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --port 8080 --open",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && netlify deploy --prod"
   },
   "devDependencies": {
     "typescript": "~5.6.2",

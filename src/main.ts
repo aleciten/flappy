@@ -53,7 +53,7 @@ function setupFullscreen() {
 // Detect mobile devices
 function isMobileDevice(): boolean {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-    (navigator.maxTouchPoints && navigator.maxTouchPoints > 2)
+    (navigator.maxTouchPoints !== undefined && navigator.maxTouchPoints > 2)
 }
 
 // Prevent default touch behaviors that interfere with gameplay
@@ -84,6 +84,6 @@ setupFullscreen()
 preventDefaultTouchBehaviors()
 
 // Make game instance available globally for debugging
-if (import.meta.env.DEV) {
+if (import.meta.env && import.meta.env.DEV) {
   ;(window as any).game = game
 }
